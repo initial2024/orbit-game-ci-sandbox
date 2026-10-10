@@ -1,0 +1,12 @@
+{
+  "name": "orbit-game-ci-sandbox",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "scripts": {
+    "check": "node --check src/game-link-issuer.js && node --check src/security-guard.js && node --check tests/issuer.test.mjs && node --check tests/source-integrity.test.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "verify": "npm run check && npm test"
+  }
+}
