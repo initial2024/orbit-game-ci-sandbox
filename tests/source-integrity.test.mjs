@@ -18,3 +18,10 @@ test("sandbox contains no embedded private key material, bearer secrets, or real
  assert.doesNotMatch(text,/sk_live_[A-Za-z0-9]{16}/);
  assert.doesNotMatch(text,/\b(?:GAME_LINK_EXCHANGE_SECRET|GAME_LINK_ED25519_PRIVATE_JWK)\s*:\s*["'][^"']{32}/);
 });
+
+test("mirrored additive game identity schema matches its reviewed private Git blob",async()=>{
+ const manifest=JSON.parse(await readFile(new URL("source-manifest.json",root),"utf8"));
+ const bytes=await readFile(new URL(manifest.schemaPath,root));
+ const hash=createHash("sha1").update("blob "+bytes.length+"\\0").update(bytes).digest("hex");
+ assert.equal(hash,manifest.schemaGitBlobSha);
+});
