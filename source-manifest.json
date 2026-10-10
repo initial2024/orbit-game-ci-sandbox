@@ -4,6 +4,6 @@
   "sourceBranch": "feat/orbit-game-identity-bridge-20261010",
   "privateFile": "workers/disposable-mail/src/game-link-issuer.js",
   "sandboxFile": "src/game-link-issuer.js",
-  "gitBlobSha": "6c7bb764b79c8622491790415ecdee03e3777086",
+  "gitBlobSha": "2b0c25c211a766b3752ec16de2e401b40643d53c",
   "securityNote": "Only the issuer module is mirrored, not the production auth middleware, database, cookies, or secrets."
 }
