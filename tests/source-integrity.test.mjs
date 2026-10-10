@@ -22,6 +22,6 @@ test("sandbox contains no embedded private key material, bearer secrets, or real
 test("mirrored additive game identity schema matches its reviewed private Git blob",async()=>{
  const manifest=JSON.parse(await readFile(new URL("source-manifest.json",root),"utf8"));
  const bytes=await readFile(new URL(manifest.schemaPath,root));
- const hash=createHash("sha1").update("blob "+bytes.length+"\\0").update(bytes).digest("hex");
+ const hash=createHash("sha1").update("blob "+bytes.length).update(Buffer.from([0])).update(bytes).digest("hex");
  assert.equal(hash,manifest.schemaGitBlobSha);
 });
