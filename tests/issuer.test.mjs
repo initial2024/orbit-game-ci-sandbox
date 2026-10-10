@@ -191,3 +191,38 @@ test("deprovisioning produces a purpose-separated ticket, never a game-login tok
  await assert.rejects(orbitLinkTokenForTests(env,"acct-591","arbitrary_purpose"));
  assert.deepEqual(await retryGameAccountDeprovision({...env,GAME_LINK_ENABLED:"false"}),{enabled:false});
 });
+
+test("verified account closure causes one purpose-specific deprovision notification with a durable acknowledgement",async t=>{
+ const{env,DB,pub}=await fixture();
+ env.GAME_LINK_DEPROVISION_ENDPOINT="https://orbit-cloud-sandbox.example/api/account/deprovision";
+ DB.closed.add("acct-591");
+ let calls=0;
+ t.mock.method(globalThis,"fetch",async(url,options)=>{
+  calls++;
+  assert.equal(url,env.GAME_LINK_DEPROVISION_ENDPOINT);
+  const jwt=JSON.parse(options.body).ticket,token=decode(jwt);
+  assert.equal(token.claims.sub,"acct-591");
+  assert.equal(token.claims.purpose,"account_deprovision");
+  const key=await webcrypto.subtle.importKey("jwk",pub,{name:"Ed25519"},false,["verify"]);
+  assert.equal(await webcrypto.subtle.verify("Ed25519",key,token.signature,token.message),true);
+  return Response.json({ok:true},{status:200});
+ });
+ const sent=await retryGameAccountDeprovision(env);
+ assert.equal(sent.delivered,1);
+ assert.equal(calls,1);
+ assert.ok(DB.deliveries.get("acct-591").delivered_at>0);
+ assert.equal((await retryGameAccountDeprovision(env)).attempted,0);
+ assert.equal(calls,1);
+});
+test("failed deletion delivery schedules retry instead of misreporting erasure",async t=>{
+ const {env,DB}=await fixture();
+ env.GAME_LINK_DEPROVISION_ENDPOINT="https://orbit-cloud-sandbox.example/api/account/deprovision";
+ DB.closed.add("acct-792");
+ t.mock.method(globalThis,"fetch",async()=>Response.json({ok:false,error:"TEMPORARY_FAILURE"},{status:503}));
+ const sent=await retryGameAccountDeprovision(env);
+ assert.equal(sent.delivered,0);
+ assert.equal(sent.attempted,1);
+ assert.equal(DB.deliveries.get("acct-792").delivered_at,null);
+ assert.ok(DB.deliveries.get("acct-792").retry_after>Date.now());
+ assert.equal((await retryGameAccountDeprovision(env)).attempted,0);
+});
