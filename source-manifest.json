@@ -5,5 +5,7 @@
   "privateFile": "workers/disposable-mail/src/game-link-issuer.js",
   "sandboxFile": "src/game-link-issuer.js",
   "gitBlobSha": "2b0c25c211a766b3752ec16de2e401b40643d53c",
-  "securityNote": "Only the issuer module is mirrored, not the production auth middleware, database, cookies, or secrets."
+  "securityNote": "Only the issuer module is mirrored, not the production auth middleware, database, cookies, or secrets.",
+  "schemaPath": "schema/game_identity_bridge.sql",
+  "schemaGitBlobSha": "9a7e02bb93afebfa6d5db94c1bfcbba9be45815d"
 }
