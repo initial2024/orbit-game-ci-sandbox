@@ -15,7 +15,7 @@ const issuerReady=env=>String(env.GAME_LINK_ENABLED||"")==="true"&&typeof env.GA
  String(env.GAME_LINK_EXCHANGE_SECRET||"").length>=32&&/^[-a-zA-Z0-9_:.\/]{6,160}$/.test(String(env.GAME_LINK_ISSUER||""))&&
  /^[-a-zA-Z0-9_:.-]{6,160}$/.test(String(env.GAME_LINK_AUDIENCE||""))&&Boolean(env.DB);
 async function codeHash(env,code){
- const key=await crypto.subtle.importKey("raw",enc.encode(env.GAME_LINK_EXCHANGE_SECRET),"HMAC",false,["sign"]);
+ const key=await crypto.subtle.importKey("raw",enc.encode(env.GAME_LINK_EXCHANGE_SECRET),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
  return Array.from(new Uint8Array(await crypto.subtle.sign("HMAC",key,enc.encode("orbit-game-link:v1:"+code))),v=>v.toString(16).padStart(2,"0")).join("");
 }
 async function signTicket(env,subject,purpose="game_login"){
